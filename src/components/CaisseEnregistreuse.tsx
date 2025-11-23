@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CreditCard, Banknote, Trash2, Check } from 'lucide-react';
+import { CreditCard, Banknote, Trash2, Check, Search } from 'lucide-react';
 
 interface Item {
   name: string;
@@ -106,6 +106,7 @@ export function CaisseEnregistreuse() {
   const [currentOrder, setCurrentOrder] = useState<Item[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [activeTab, setActiveTab] = useState<'menu' | 'historique' | 'data'>('menu');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const addItem = (item: Item) => {
     setCurrentOrder([...currentOrder, item]);
@@ -142,6 +143,38 @@ export function CaisseEnregistreuse() {
     setTransactions(transactions.filter(t => t.id !== id));
   };
 
+  // Fonction de recherche
+  const filterItems = () => {
+    const query = searchQuery.toLowerCase();
+    if (!query) return { categories: MENU_ITEMS, wines: WINE_MENU };
+
+    // Filtrer les catégories de menu
+    const filteredCategories = MENU_ITEMS.map(category => ({
+      ...category,
+      items: category.items.filter(item => 
+        item.name.toLowerCase().includes(query)
+      )
+    })).filter(category => category.items.length > 0);
+
+    // Filtrer les vins
+    const filteredWineSubcategories = WINE_MENU.subcategories.map(subcategory => ({
+      ...subcategory,
+      wines: subcategory.wines.filter(wine => 
+        wine.name.toLowerCase().includes(query) ||
+        subcategory.name.toLowerCase().includes(query)
+      )
+    })).filter(subcategory => subcategory.wines.length > 0);
+
+    const filteredWines = {
+      category: WINE_MENU.category,
+      subcategories: filteredWineSubcategories
+    };
+
+    return { categories: filteredCategories, wines: filteredWines };
+  };
+
+  const { categories: filteredCategories, wines: filteredWines } = filterItems();
+
   // Calculs pour les statistiques
   const totalCA = transactions.reduce((sum, t) => sum + t.total, 0);
   const totalCB = transactions.filter(t => t.paymentMethod === 'cb').reduce((sum, t) => sum + t.total, 0);
@@ -161,17 +194,17 @@ export function CaisseEnregistreuse() {
 
   return (
     <div className="max-w-7xl mx-auto p-6 h-screen flex flex-col bg-[#f5f1e8]">
-      <div className="mb-6">
-        <h1 className="text-[#7d1f1f]">Autobus Café - Caisse</h1>
+      <div className="mb-8">
+        <h1 className="text-[#7d1f1f] text-center">Autobus Café - Caisse</h1>
       </div>
 
       {/* Tabs */}
-      <div className="mb-4 flex gap-2">
+      <div className="mb-6 flex gap-3">
         <button
           onClick={() => setActiveTab('menu')}
-          className={`px-6 py-3 rounded-lg transition-all ${
+          className={`px-8 py-4 rounded-xl transition-all shadow-sm ${
             activeTab === 'menu'
-              ? 'bg-[#7d1f1f] text-[#fdfcf7] shadow-md'
+              ? 'bg-[#7d1f1f] text-[#fdfcf7] shadow-md scale-105'
               : 'bg-[#fdfcf7] text-[#7d1f1f] hover:bg-[#f5f1e8]'
           }`}
         >
@@ -179,9 +212,9 @@ export function CaisseEnregistreuse() {
         </button>
         <button
           onClick={() => setActiveTab('historique')}
-          className={`px-6 py-3 rounded-lg transition-all ${
+          className={`px-8 py-4 rounded-xl transition-all shadow-sm ${
             activeTab === 'historique'
-              ? 'bg-[#7d1f1f] text-[#fdfcf7] shadow-md'
+              ? 'bg-[#7d1f1f] text-[#fdfcf7] shadow-md scale-105'
               : 'bg-[#fdfcf7] text-[#7d1f1f] hover:bg-[#f5f1e8]'
           }`}
         >
@@ -189,9 +222,9 @@ export function CaisseEnregistreuse() {
         </button>
         <button
           onClick={() => setActiveTab('data')}
-          className={`px-6 py-3 rounded-lg transition-all ${
+          className={`px-8 py-4 rounded-xl transition-all shadow-sm ${
             activeTab === 'data'
-              ? 'bg-[#7d1f1f] text-[#fdfcf7] shadow-md'
+              ? 'bg-[#7d1f1f] text-[#fdfcf7] shadow-md scale-105'
               : 'bg-[#fdfcf7] text-[#7d1f1f] hover:bg-[#f5f1e8]'
           }`}
         >
@@ -201,17 +234,32 @@ export function CaisseEnregistreuse() {
 
       <div className="flex-1 grid grid-cols-3 gap-6 overflow-hidden">
         {/* Left Panel - Tab Content */}
-        <div className="col-span-2 bg-[#fdfcf7] rounded-2xl shadow-lg p-6 overflow-y-auto">
+        <div className="col-span-2 bg-[#fdfcf7] rounded-2xl shadow-lg p-8 overflow-y-auto">
           
           {/* Menu Tab */}
           {activeTab === 'menu' && (
             <>
-              <h2 className="text-[#7d1f1f] mb-4">Menu</h2>
-              <div className="space-y-6">
-                {MENU_ITEMS.map((category, catIndex) => (
+              {/* Search Bar */}
+              <div className="mb-8">
+                <div className="relative">
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <input
+                    type="text"
+                    placeholder="Rechercher un produit..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-12 pr-4 py-4 bg-[#f5f1e8] border-2 border-[#d4c5a9] rounded-xl text-gray-700 placeholder-gray-400 focus:outline-none focus:border-[#8b2e2e] transition-colors"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-10">
+                {filteredCategories.map((category, catIndex) => (
                   <div key={catIndex}>
-                    <h3 className="text-[#7d1f1f] mb-3">{category.category}</h3>
-                    <div className="grid grid-cols-3 gap-3">
+                    <div className="mb-5 pb-2 border-b-2 border-[#d4c5a9]">
+                      <h3 className="text-[#7d1f1f]">{category.category}</h3>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4">
                       {category.items.map((item, index) => (
                         <button
                           key={index}
@@ -227,41 +275,56 @@ export function CaisseEnregistreuse() {
                 ))}
                 
                 {/* Wine Menu */}
-                <div>
-                  <h3 className="text-[#7d1f1f] mb-3">{WINE_MENU.category}</h3>
-                  {WINE_MENU.subcategories.map((subcategory, subIndex) => (
-                    <div key={subIndex} className="mb-6">
-                      <h4 className="text-[#7d1f1f] bg-gradient-to-r from-[#f5f1e8] to-transparent py-2 px-4 rounded-lg mb-3 border-l-4 border-[#8b2e2e]">{subcategory.name}</h4>
-                      <div className="space-y-2">
-                        {subcategory.wines.map((wine, wineIndex) => (
-                          <div key={wineIndex} className="bg-[#f5f1e8] p-3 rounded-lg">
-                            <div className="text-[#7d1f1f] mb-2">{wine.name}</div>
-                            <div className="grid grid-cols-3 gap-2">
-                              <button
-                                onClick={() => addItem({ name: `${wine.name} (Verre)`, price: wine.prices.verre })}
-                                className="bg-gradient-to-br from-[#8b2e2e] to-[#7d1f1f] hover:from-[#9d3636] hover:to-[#8b2e2e] text-[#fdfcf7] py-2 px-3 rounded-lg shadow-sm transition-all hover:scale-105 active:scale-95 text-sm"
-                              >
-                                Verre<br />{wine.prices.verre} €
-                              </button>
-                              <button
-                                onClick={() => addItem({ name: `${wine.name} (Double)`, price: wine.prices.doubleVerre })}
-                                className="bg-gradient-to-br from-[#8b2e2e] to-[#7d1f1f] hover:from-[#9d3636] hover:to-[#8b2e2e] text-[#fdfcf7] py-2 px-3 rounded-lg shadow-sm transition-all hover:scale-105 active:scale-95 text-sm"
-                              >
-                                Double<br />{wine.prices.doubleVerre} €
-                              </button>
-                              <button
-                                onClick={() => addItem({ name: `${wine.name} (Bouteille)`, price: wine.prices.bouteille })}
-                                className="bg-gradient-to-br from-[#8b2e2e] to-[#7d1f1f] hover:from-[#9d3636] hover:to-[#8b2e2e] text-[#fdfcf7] py-2 px-3 rounded-lg shadow-sm transition-all hover:scale-105 active:scale-95 text-sm"
-                              >
-                                Bouteille<br />{wine.prices.bouteille} €
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
+                {filteredWines.subcategories.length > 0 && (
+                  <div>
+                    <div className="mb-5 pb-2 border-b-2 border-[#d4c5a9]">
+                      <h3 className="text-[#7d1f1f]">{filteredWines.category}</h3>
                     </div>
-                  ))}
-                </div>
+                    <div className="space-y-8">
+                      {filteredWines.subcategories.map((subcategory, subIndex) => (
+                        <div key={subIndex}>
+                          <div className="mb-4">
+                            <h4 className="text-[#7d1f1f] bg-gradient-to-r from-[#f5f1e8] to-transparent py-3 px-5 rounded-lg border-l-4 border-[#8b2e2e]">{subcategory.name}</h4>
+                          </div>
+                          <div className="space-y-3">
+                            {subcategory.wines.map((wine, wineIndex) => (
+                              <div key={wineIndex} className="bg-[#f5f1e8] p-4 rounded-xl">
+                                <div className="text-[#7d1f1f] mb-3">{wine.name}</div>
+                                <div className="grid grid-cols-3 gap-3">
+                                  <button
+                                    onClick={() => addItem({ name: `${wine.name} (Verre)`, price: wine.prices.verre })}
+                                    className="bg-gradient-to-br from-[#8b2e2e] to-[#7d1f1f] hover:from-[#9d3636] hover:to-[#8b2e2e] text-[#fdfcf7] py-3 px-3 rounded-lg shadow-sm transition-all hover:scale-105 active:scale-95 text-sm"
+                                  >
+                                    Verre<br />{wine.prices.verre} €
+                                  </button>
+                                  <button
+                                    onClick={() => addItem({ name: `${wine.name} (Double)`, price: wine.prices.doubleVerre })}
+                                    className="bg-gradient-to-br from-[#8b2e2e] to-[#7d1f1f] hover:from-[#9d3636] hover:to-[#8b2e2e] text-[#fdfcf7] py-3 px-3 rounded-lg shadow-sm transition-all hover:scale-105 active:scale-95 text-sm"
+                                  >
+                                    Double<br />{wine.prices.doubleVerre} €
+                                  </button>
+                                  <button
+                                    onClick={() => addItem({ name: `${wine.name} (Bouteille)`, price: wine.prices.bouteille })}
+                                    className="bg-gradient-to-br from-[#8b2e2e] to-[#7d1f1f] hover:from-[#9d3636] hover:to-[#8b2e2e] text-[#fdfcf7] py-3 px-3 rounded-lg shadow-sm transition-all hover:scale-105 active:scale-95 text-sm"
+                                  >
+                                    Bouteille<br />{wine.prices.bouteille} €
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* No results message */}
+                {filteredCategories.length === 0 && filteredWines.subcategories.length === 0 && searchQuery && (
+                  <div className="text-center py-12 text-gray-400">
+                    Aucun produit trouvé pour "{searchQuery}"
+                  </div>
+                )}
               </div>
             </>
           )}
@@ -269,41 +332,43 @@ export function CaisseEnregistreuse() {
           {/* Historique Tab */}
           {activeTab === 'historique' && (
             <>
-              <h2 className="text-[#7d1f1f] mb-4">Historique des transactions</h2>
+              <div className="mb-6">
+                <h2 className="text-[#7d1f1f]">Historique des transactions</h2>
+              </div>
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="border-b-2 border-[#d4c5a9]">
-                      <th className="text-left p-3 text-[#7d1f1f]">Heure</th>
-                      <th className="text-left p-3 text-[#7d1f1f]">Articles</th>
-                      <th className="text-right p-3 text-[#7d1f1f]">Total</th>
-                      <th className="text-center p-3 text-[#7d1f1f]">Paiement</th>
-                      <th className="text-center p-3 text-[#7d1f1f]">Action</th>
+                      <th className="text-left p-4 text-[#7d1f1f]">Heure</th>
+                      <th className="text-left p-4 text-[#7d1f1f]">Articles</th>
+                      <th className="text-right p-4 text-[#7d1f1f]">Total</th>
+                      <th className="text-center p-4 text-[#7d1f1f]">Paiement</th>
+                      <th className="text-center p-4 text-[#7d1f1f]">Action</th>
                     </tr>
                   </thead>
                   <tbody>
                     {transactions.length === 0 ? (
                       <tr>
-                        <td colSpan={5} className="text-center py-8 text-gray-400">
+                        <td colSpan={5} className="text-center py-12 text-gray-400">
                           Aucune transaction
                         </td>
                       </tr>
                     ) : (
                       transactions.map((transaction) => (
                         <tr key={transaction.id} className="border-b border-[#d4c5a9] hover:bg-[#f5f1e8]">
-                          <td className="p-3 text-gray-600">
+                          <td className="p-4 text-gray-600">
                             {transaction.timestamp.toLocaleTimeString('fr-FR', { 
                               hour: '2-digit', 
                               minute: '2-digit' 
                             })}
                           </td>
-                          <td className="p-3 text-gray-600">
+                          <td className="p-4 text-gray-600">
                             {transaction.items.map((item, i) => item.name).join(', ')}
                           </td>
-                          <td className="p-3 text-right text-[#7d1f1f]">
+                          <td className="p-4 text-right text-[#7d1f1f]">
                             {transaction.total.toFixed(2)} €
                           </td>
-                          <td className="p-3 text-center">
+                          <td className="p-4 text-center">
                             {transaction.paymentMethod === 'cb' ? (
                               <span className="inline-flex items-center gap-1 bg-blue-100 text-blue-700 px-3 py-1 rounded-full">
                                 <CreditCard className="w-4 h-4" />
@@ -316,7 +381,7 @@ export function CaisseEnregistreuse() {
                               </span>
                             )}
                           </td>
-                          <td className="p-3 text-center">
+                          <td className="p-4 text-center">
                             <button
                               onClick={() => deleteTransaction(transaction.id)}
                               className="bg-red-600 hover:bg-red-700 text-white p-2 rounded-full shadow-md transition-all"
@@ -336,10 +401,12 @@ export function CaisseEnregistreuse() {
           {/* Data Tab */}
           {activeTab === 'data' && (
             <>
-              <h2 className="text-[#7d1f1f] mb-6">Statistiques</h2>
+              <div className="mb-8">
+                <h2 className="text-[#7d1f1f]">Statistiques</h2>
+              </div>
               
               {/* Résumé général */}
-              <div className="grid grid-cols-3 gap-4 mb-8">
+              <div className="grid grid-cols-3 gap-6 mb-10">
                 <div className="bg-gradient-to-br from-[#8b2e2e] to-[#7d1f1f] text-[#fdfcf7] p-6 rounded-xl shadow-md">
                   <div className="text-sm opacity-80 mb-2">Chiffre d'affaires total</div>
                   <div className="text-3xl">{totalCA.toFixed(2)} €</div>
@@ -356,20 +423,22 @@ export function CaisseEnregistreuse() {
 
               {/* Ventes par produit */}
               <div>
-                <h3 className="text-[#7d1f1f] mb-4">Ventes par produit</h3>
+                <div className="mb-5 pb-2 border-b-2 border-[#d4c5a9]">
+                  <h3 className="text-[#7d1f1f]">Ventes par produit</h3>
+                </div>
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
                       <tr className="border-b-2 border-[#d4c5a9]">
-                        <th className="text-left p-3 text-[#7d1f1f]">Produit</th>
-                        <th className="text-center p-3 text-[#7d1f1f]">Quantité</th>
-                        <th className="text-right p-3 text-[#7d1f1f]">Total</th>
+                        <th className="text-left p-4 text-[#7d1f1f]">Produit</th>
+                        <th className="text-center p-4 text-[#7d1f1f]">Quantité</th>
+                        <th className="text-right p-4 text-[#7d1f1f]">Total</th>
                       </tr>
                     </thead>
                     <tbody>
                       {Object.keys(salesByProduct).length === 0 ? (
                         <tr>
-                          <td colSpan={3} className="text-center py-8 text-gray-400">
+                          <td colSpan={3} className="text-center py-12 text-gray-400">
                             Aucune vente
                           </td>
                         </tr>
@@ -378,9 +447,9 @@ export function CaisseEnregistreuse() {
                           .sort((a, b) => b[1].total - a[1].total)
                           .map(([productName, data]) => (
                             <tr key={productName} className="border-b border-[#d4c5a9] hover:bg-[#f5f1e8]">
-                              <td className="p-3 text-gray-700">{productName}</td>
-                              <td className="p-3 text-center text-gray-600">{data.quantity}</td>
-                              <td className="p-3 text-right text-[#7d1f1f]">
+                              <td className="p-4 text-gray-700">{productName}</td>
+                              <td className="p-4 text-center text-gray-600">{data.quantity}</td>
+                              <td className="p-4 text-right text-[#7d1f1f]">
                                 {data.total.toFixed(2)} €
                               </td>
                             </tr>
@@ -395,15 +464,17 @@ export function CaisseEnregistreuse() {
         </div>
 
         {/* Current Order - Always visible on the right */}
-        <div className="bg-[#fdfcf7] rounded-2xl shadow-lg p-6 flex flex-col">
-          <h2 className="text-[#7d1f1f] mb-4">Commande en cours</h2>
+        <div className="bg-[#fdfcf7] rounded-2xl shadow-lg p-8 flex flex-col">
+          <div className="mb-6 pb-3 border-b-2 border-[#d4c5a9]">
+            <h2 className="text-[#7d1f1f]">Commande en cours</h2>
+          </div>
           
-          <div className="flex-1 overflow-y-auto mb-4 space-y-2">
+          <div className="flex-1 overflow-y-auto mb-6 space-y-3">
             {currentOrder.length === 0 ? (
-              <p className="text-gray-400 text-center py-8">Aucun article</p>
+              <p className="text-gray-400 text-center py-12">Aucun article</p>
             ) : (
               currentOrder.map((item, index) => (
-                <div key={index} className="flex justify-between items-center p-3 bg-[#f5f1e8] rounded-lg">
+                <div key={index} className="flex justify-between items-center p-4 bg-[#f5f1e8] rounded-xl shadow-sm">
                   <span className="text-gray-700">{item.name}</span>
                   <span className="text-[#7d1f1f]">{item.price.toFixed(2)} €</span>
                 </div>
@@ -412,7 +483,7 @@ export function CaisseEnregistreuse() {
           </div>
 
           {/* Total */}
-          <div className="border-t-2 border-[#d4c5a9] pt-4 mb-4">
+          <div className="border-t-2 border-[#d4c5a9] pt-5 mb-6">
             <div className="flex justify-between items-center mb-4">
               <span className="text-gray-700">Total</span>
               <span className="text-[#7d1f1f]">{total.toFixed(2)} €</span>
