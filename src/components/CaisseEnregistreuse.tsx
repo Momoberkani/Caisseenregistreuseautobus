@@ -108,6 +108,7 @@ export function CaisseEnregistreuse() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [activeTab, setActiveTab] = useState<'menu' | 'historique' | 'data'>('menu');
   const [searchQuery, setSearchQuery] = useState('');
+  const [showOrderPanel, setShowOrderPanel] = useState(true);
 
   const addItem = (item: Item) => {
     setCurrentOrder([...currentOrder, item]);
@@ -138,6 +139,7 @@ export function CaisseEnregistreuse() {
 
     setTransactions([transaction, ...transactions]);
     setCurrentOrder([]);
+    setShowOrderPanel(false);
   };
 
   const deleteTransaction = (id: string) => {
@@ -196,16 +198,16 @@ export function CaisseEnregistreuse() {
   });
 
   return (
-    <div className="max-w-7xl mx-auto p-6 h-screen flex flex-col bg-[#f5f1e8]">
-      <div className="mb-8">
+    <div className="max-w-7xl mx-auto p-3 md:p-6 min-h-screen flex flex-col bg-[#f5f1e8]">
+      <div className="mb-4 md:mb-8">
         <h1 className="text-[#7d1f1f] text-center">Autobus Café - Caisse</h1>
       </div>
 
       {/* Tabs */}
-      <div className="mb-6 flex gap-3">
+      <div className="mb-4 md:mb-6 flex gap-2 md:gap-3 overflow-x-auto">
         <button
           onClick={() => setActiveTab('menu')}
-          className={`px-8 py-4 rounded-xl transition-all shadow-sm ${
+          className={`px-4 md:px-8 py-3 md:py-4 rounded-xl transition-all shadow-sm whitespace-nowrap ${
             activeTab === 'menu'
               ? 'bg-[#7d1f1f] text-[#fdfcf7] shadow-md scale-105'
               : 'bg-[#fdfcf7] text-[#7d1f1f] hover:bg-[#f5f1e8]'
@@ -215,7 +217,7 @@ export function CaisseEnregistreuse() {
         </button>
         <button
           onClick={() => setActiveTab('historique')}
-          className={`px-8 py-4 rounded-xl transition-all shadow-sm ${
+          className={`px-4 md:px-8 py-3 md:py-4 rounded-xl transition-all shadow-sm whitespace-nowrap ${
             activeTab === 'historique'
               ? 'bg-[#7d1f1f] text-[#fdfcf7] shadow-md scale-105'
               : 'bg-[#fdfcf7] text-[#7d1f1f] hover:bg-[#f5f1e8]'
@@ -225,7 +227,7 @@ export function CaisseEnregistreuse() {
         </button>
         <button
           onClick={() => setActiveTab('data')}
-          className={`px-8 py-4 rounded-xl transition-all shadow-sm ${
+          className={`px-4 md:px-8 py-3 md:py-4 rounded-xl transition-all shadow-sm whitespace-nowrap ${
             activeTab === 'data'
               ? 'bg-[#7d1f1f] text-[#fdfcf7] shadow-md scale-105'
               : 'bg-[#fdfcf7] text-[#7d1f1f] hover:bg-[#f5f1e8]'
@@ -235,15 +237,15 @@ export function CaisseEnregistreuse() {
         </button>
       </div>
 
-      <div className="flex-1 grid grid-cols-3 gap-6 overflow-hidden">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 overflow-hidden">
         {/* Left Panel - Tab Content */}
-        <div className="col-span-2 bg-[#fdfcf7] rounded-2xl shadow-lg p-8 overflow-y-auto">
+        <div className="lg:col-span-2 bg-[#fdfcf7] rounded-2xl shadow-lg p-4 md:p-8 overflow-y-auto">
           
           {/* Menu Tab */}
           {activeTab === 'menu' && (
             <>
               {/* Search Bar */}
-              <div className="mb-8">
+              <div className="mb-6 md:mb-8">
                 <div className="relative">
                   <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                   <input
@@ -251,23 +253,23 @@ export function CaisseEnregistreuse() {
                     placeholder="Rechercher un produit..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-12 pr-4 py-4 bg-[#f5f1e8] border-2 border-[#d4c5a9] rounded-xl text-gray-700 placeholder-gray-400 focus:outline-none focus:border-[#8b2e2e] transition-colors"
+                    className="w-full pl-12 pr-4 py-3 md:py-4 bg-[#f5f1e8] border-2 border-[#d4c5a9] rounded-xl text-gray-700 placeholder-gray-400 focus:outline-none focus:border-[#8b2e2e] transition-colors"
                   />
                 </div>
               </div>
 
-              <div className="space-y-10">
+              <div className="space-y-6 md:space-y-10">
                 {filteredCategories.map((category, catIndex) => (
                   <div key={catIndex}>
-                    <div className="mb-5 pb-2 border-b-2 border-[#d4c5a9]">
+                    <div className="mb-3 md:mb-5 pb-2 border-b-2 border-[#d4c5a9]">
                       <h3 className="text-[#7d1f1f]">{category.category}</h3>
                     </div>
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
                       {category.items.map((item, index) => (
                         <button
                           key={index}
                           onClick={() => addItem(item)}
-                          className="bg-gradient-to-br from-[#8b2e2e] to-[#7d1f1f] hover:from-[#9d3636] hover:to-[#8b2e2e] text-[#fdfcf7] p-6 rounded-xl shadow-md transition-all hover:scale-105 active:scale-95 flex flex-col items-center justify-center gap-2"
+                          className="bg-gradient-to-br from-[#8b2e2e] to-[#7d1f1f] hover:from-[#9d3636] hover:to-[#8b2e2e] text-[#fdfcf7] p-4 md:p-6 rounded-xl shadow-md transition-all hover:scale-105 active:scale-95 flex flex-col items-center justify-center gap-2"
                         >
                           <span className="text-center">{item.name}</span>
                           <span className="opacity-90">{item.price.toFixed(2)} €</span>
@@ -280,35 +282,35 @@ export function CaisseEnregistreuse() {
                 {/* Wine Menu */}
                 {filteredWines.subcategories.length > 0 && (
                   <div>
-                    <div className="mb-5 pb-2 border-b-2 border-[#d4c5a9]">
+                    <div className="mb-3 md:mb-5 pb-2 border-b-2 border-[#d4c5a9]">
                       <h3 className="text-[#7d1f1f]">{filteredWines.category}</h3>
                     </div>
-                    <div className="space-y-8">
+                    <div className="space-y-6 md:space-y-8">
                       {filteredWines.subcategories.map((subcategory, subIndex) => (
                         <div key={subIndex}>
-                          <div className="mb-4">
-                            <h4 className="text-[#7d1f1f] bg-gradient-to-r from-[#f5f1e8] to-transparent py-3 px-5 rounded-lg border-l-4 border-[#8b2e2e]">{subcategory.name}</h4>
+                          <div className="mb-3 md:mb-4">
+                            <h4 className="text-[#7d1f1f] bg-gradient-to-r from-[#f5f1e8] to-transparent py-2 md:py-3 px-3 md:px-5 rounded-lg border-l-4 border-[#8b2e2e]">{subcategory.name}</h4>
                           </div>
-                          <div className="space-y-3">
+                          <div className="space-y-2 md:space-y-3">
                             {subcategory.wines.map((wine, wineIndex) => (
-                              <div key={wineIndex} className="bg-[#f5f1e8] p-4 rounded-xl">
-                                <div className="text-[#7d1f1f] mb-3">{wine.name}</div>
-                                <div className="grid grid-cols-3 gap-3">
+                              <div key={wineIndex} className="bg-[#f5f1e8] p-3 md:p-4 rounded-xl">
+                                <div className="text-[#7d1f1f] mb-2 md:mb-3 text-sm md:text-base">{wine.name}</div>
+                                <div className="grid grid-cols-3 gap-2 md:gap-3">
                                   <button
                                     onClick={() => addItem({ name: `${wine.name} (Verre)`, price: wine.prices.verre })}
-                                    className="bg-gradient-to-br from-[#8b2e2e] to-[#7d1f1f] hover:from-[#9d3636] hover:to-[#8b2e2e] text-[#fdfcf7] py-3 px-3 rounded-lg shadow-sm transition-all hover:scale-105 active:scale-95 text-sm"
+                                    className="bg-gradient-to-br from-[#8b2e2e] to-[#7d1f1f] hover:from-[#9d3636] hover:to-[#8b2e2e] text-[#fdfcf7] py-2 md:py-3 px-2 md:px-3 rounded-lg shadow-sm transition-all hover:scale-105 active:scale-95 text-xs md:text-sm"
                                   >
                                     Verre<br />{wine.prices.verre} €
                                   </button>
                                   <button
                                     onClick={() => addItem({ name: `${wine.name} (Double)`, price: wine.prices.doubleVerre })}
-                                    className="bg-gradient-to-br from-[#8b2e2e] to-[#7d1f1f] hover:from-[#9d3636] hover:to-[#8b2e2e] text-[#fdfcf7] py-3 px-3 rounded-lg shadow-sm transition-all hover:scale-105 active:scale-95 text-sm"
+                                    className="bg-gradient-to-br from-[#8b2e2e] to-[#7d1f1f] hover:from-[#9d3636] hover:to-[#8b2e2e] text-[#fdfcf7] py-2 md:py-3 px-2 md:px-3 rounded-lg shadow-sm transition-all hover:scale-105 active:scale-95 text-xs md:text-sm"
                                   >
                                     Double<br />{wine.prices.doubleVerre} €
                                   </button>
                                   <button
                                     onClick={() => addItem({ name: `${wine.name} (Bouteille)`, price: wine.prices.bouteille })}
-                                    className="bg-gradient-to-br from-[#8b2e2e] to-[#7d1f1f] hover:from-[#9d3636] hover:to-[#8b2e2e] text-[#fdfcf7] py-3 px-3 rounded-lg shadow-sm transition-all hover:scale-105 active:scale-95 text-sm"
+                                    className="bg-gradient-to-br from-[#8b2e2e] to-[#7d1f1f] hover:from-[#9d3636] hover:to-[#8b2e2e] text-[#fdfcf7] py-2 md:py-3 px-2 md:px-3 rounded-lg shadow-sm transition-all hover:scale-105 active:scale-95 text-xs md:text-sm"
                                   >
                                     Bouteille<br />{wine.prices.bouteille} €
                                   </button>
@@ -324,7 +326,7 @@ export function CaisseEnregistreuse() {
 
                 {/* No results message */}
                 {filteredCategories.length === 0 && filteredWines.subcategories.length === 0 && searchQuery && (
-                  <div className="text-center py-12 text-gray-400">
+                  <div className="text-center py-8 md:py-12 text-gray-400">
                     Aucun produit trouvé pour "{searchQuery}"
                   </div>
                 )}
@@ -335,134 +337,72 @@ export function CaisseEnregistreuse() {
           {/* Historique Tab */}
           {activeTab === 'historique' && (
             <>
-              <div className="mb-6">
+              <div className="mb-4 md:mb-6">
                 <h2 className="text-[#7d1f1f]">Historique des transactions</h2>
               </div>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b-2 border-[#d4c5a9]">
-                      <th className="text-left p-4 text-[#7d1f1f]">Heure</th>
-                      <th className="text-left p-4 text-[#7d1f1f]">Articles</th>
-                      <th className="text-right p-4 text-[#7d1f1f]">Total</th>
-                      <th className="text-center p-4 text-[#7d1f1f]">Paiement</th>
-                      <th className="text-center p-4 text-[#7d1f1f]">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {transactions.length === 0 ? (
-                      <tr>
-                        <td colSpan={5} className="text-center py-12 text-gray-400">
-                          Aucune transaction
-                        </td>
-                      </tr>
-                    ) : (
-                      transactions.map((transaction) => (
-                        <tr key={transaction.id} className={`border-b border-[#d4c5a9] hover:bg-[#f5f1e8] ${transaction.cancelled ? 'opacity-50' : ''}`}>
-                          <td className="p-4 text-gray-600">
-                            {transaction.timestamp.toLocaleTimeString('fr-FR', { 
-                              hour: '2-digit', 
-                              minute: '2-digit' 
-                            })}
-                          </td>
-                          <td className="p-4 text-gray-600">
-                            {transaction.items.map((item, i) => item.name).join(', ')}
-                          </td>
-                          <td className={`p-4 text-right ${transaction.cancelled ? 'text-gray-400 line-through' : 'text-[#7d1f1f]'}`}>
-                            {transaction.total.toFixed(2)} €
-                          </td>
-                          <td className="p-4 text-center">
-                            {transaction.cancelled ? (
-                              <span className="inline-flex items-center gap-1 bg-gray-100 text-gray-500 px-3 py-1 rounded-full">
-                                Annulé
-                              </span>
-                            ) : transaction.paymentMethod === 'cb' ? (
-                              <span className="inline-flex items-center gap-1 bg-blue-100 text-blue-700 px-3 py-1 rounded-full">
-                                <CreditCard className="w-4 h-4" />
-                                CB
-                              </span>
-                            ) : (
-                              <span className="inline-flex items-center gap-1 bg-green-100 text-green-700 px-3 py-1 rounded-full">
-                                <Banknote className="w-4 h-4" />
-                                Espèces
-                              </span>
-                            )}
-                          </td>
-                          <td className="p-4 text-center">
-                            {!transaction.cancelled && (
-                              <button
-                                onClick={() => deleteTransaction(transaction.id)}
-                                className="bg-red-600 hover:bg-red-700 text-white p-2 rounded-full shadow-md transition-all"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </button>
-                            )}
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </>
-          )}
-
-          {/* Data Tab */}
-          {activeTab === 'data' && (
-            <>
-              <div className="mb-8">
-                <h2 className="text-[#7d1f1f]">Statistiques</h2>
-              </div>
-              
-              {/* Résumé général */}
-              <div className="grid grid-cols-3 gap-6 mb-10">
-                <div className="bg-gradient-to-br from-[#8b2e2e] to-[#7d1f1f] text-[#fdfcf7] p-6 rounded-xl shadow-md">
-                  <div className="text-sm opacity-80 mb-2">Chiffre d'affaires total</div>
-                  <div className="text-3xl">{totalCA.toFixed(2)} €</div>
-                </div>
-                <div className="bg-blue-600 text-white p-6 rounded-xl shadow-md">
-                  <div className="text-sm opacity-80 mb-2">Paiements CB</div>
-                  <div className="text-3xl">{totalCB.toFixed(2)} €</div>
-                </div>
-                <div className="bg-green-600 text-white p-6 rounded-xl shadow-md">
-                  <div className="text-sm opacity-80 mb-2">Paiements Espèces</div>
-                  <div className="text-3xl">{totalEspeces.toFixed(2)} €</div>
-                </div>
-              </div>
-
-              {/* Ventes par produit */}
-              <div>
-                <div className="mb-5 pb-2 border-b-2 border-[#d4c5a9]">
-                  <h3 className="text-[#7d1f1f]">Ventes par produit</h3>
-                </div>
-                <div className="overflow-x-auto">
+              <div className="overflow-x-auto -mx-4 md:mx-0">
+                <div className="min-w-[600px] px-4 md:px-0">
                   <table className="w-full">
                     <thead>
                       <tr className="border-b-2 border-[#d4c5a9]">
-                        <th className="text-left p-4 text-[#7d1f1f]">Produit</th>
-                        <th className="text-center p-4 text-[#7d1f1f]">Quantité</th>
-                        <th className="text-right p-4 text-[#7d1f1f]">Total</th>
+                        <th className="text-left p-3 md:p-4 text-[#7d1f1f]">Heure</th>
+                        <th className="text-left p-3 md:p-4 text-[#7d1f1f]">Articles</th>
+                        <th className="text-right p-3 md:p-4 text-[#7d1f1f]">Total</th>
+                        <th className="text-center p-3 md:p-4 text-[#7d1f1f]">Paiement</th>
+                        <th className="text-center p-3 md:p-4 text-[#7d1f1f]">Action</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {Object.keys(salesByProduct).length === 0 ? (
+                      {transactions.length === 0 ? (
                         <tr>
-                          <td colSpan={3} className="text-center py-12 text-gray-400">
-                            Aucune vente
+                          <td colSpan={5} className="text-center py-8 md:py-12 text-gray-400">
+                            Aucune transaction
                           </td>
                         </tr>
                       ) : (
-                        Object.entries(salesByProduct)
-                          .sort((a, b) => b[1].total - a[1].total)
-                          .map(([productName, data]) => (
-                            <tr key={productName} className="border-b border-[#d4c5a9] hover:bg-[#f5f1e8]">
-                              <td className="p-4 text-gray-700">{productName}</td>
-                              <td className="p-4 text-center text-gray-600">{data.quantity}</td>
-                              <td className="p-4 text-right text-[#7d1f1f]">
-                                {data.total.toFixed(2)} €
-                              </td>
-                            </tr>
-                          ))
+                        transactions.map((transaction) => (
+                          <tr key={transaction.id} className={`border-b border-[#d4c5a9] hover:bg-[#f5f1e8] ${transaction.cancelled ? 'opacity-50' : ''}`}>
+                            <td className="p-3 md:p-4 text-gray-600 text-sm md:text-base">
+                              {transaction.timestamp.toLocaleTimeString('fr-FR', { 
+                                hour: '2-digit', 
+                                minute: '2-digit' 
+                              })}
+                            </td>
+                            <td className="p-3 md:p-4 text-gray-600 text-sm md:text-base">
+                              {transaction.items.map((item, i) => item.name).join(', ')}
+                            </td>
+                            <td className={`p-3 md:p-4 text-right text-sm md:text-base ${transaction.cancelled ? 'text-gray-400 line-through' : 'text-[#7d1f1f]'}`}>
+                              {transaction.total.toFixed(2)} €
+                            </td>
+                            <td className="p-3 md:p-4 text-center">
+                              {transaction.cancelled ? (
+                                <span className="inline-flex items-center gap-1 bg-gray-100 text-gray-500 px-2 md:px-3 py-1 rounded-full text-xs md:text-sm">
+                                  Annulé
+                                </span>
+                              ) : transaction.paymentMethod === 'cb' ? (
+                                <span className="inline-flex items-center gap-1 bg-blue-100 text-blue-700 px-2 md:px-3 py-1 rounded-full text-xs md:text-sm">
+                                  <CreditCard className="w-3 md:w-4 h-3 md:h-4" />
+                                  CB
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 bg-green-100 text-green-700 px-2 md:px-3 py-1 rounded-full text-xs md:text-sm">
+                                  <Banknote className="w-3 md:w-4 h-3 md:h-4" />
+                                  Espèces
+                                </span>
+                              )}
+                            </td>
+                            <td className="p-3 md:p-4 text-center">
+                              {!transaction.cancelled && (
+                                <button
+                                  onClick={() => deleteTransaction(transaction.id)}
+                                  className="bg-red-600 hover:bg-red-700 text-white p-2 rounded-full shadow-md transition-all"
+                                >
+                                  <Trash2 className="w-3 md:w-4 h-3 md:h-4" />
+                                </button>
+                              )}
+                            </td>
+                          </tr>
+                        ))
                       )}
                     </tbody>
                   </table>
@@ -470,10 +410,76 @@ export function CaisseEnregistreuse() {
               </div>
             </>
           )}
+
+          {/* Data Tab */}
+          {activeTab === 'data' && (
+            <>
+              <div className="mb-6 md:mb-8">
+                <h2 className="text-[#7d1f1f]">Statistiques</h2>
+              </div>
+              
+              {/* Résumé général */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-10">
+                <div className="bg-gradient-to-br from-[#8b2e2e] to-[#7d1f1f] text-[#fdfcf7] p-4 md:p-6 rounded-xl shadow-md">
+                  <div className="text-xs md:text-sm opacity-80 mb-2">Chiffre d'affaires total</div>
+                  <div className="text-2xl md:text-3xl">{totalCA.toFixed(2)} €</div>
+                </div>
+                <div className="bg-blue-600 text-white p-4 md:p-6 rounded-xl shadow-md">
+                  <div className="text-xs md:text-sm opacity-80 mb-2">Paiements CB</div>
+                  <div className="text-2xl md:text-3xl">{totalCB.toFixed(2)} €</div>
+                </div>
+                <div className="bg-green-600 text-white p-4 md:p-6 rounded-xl shadow-md">
+                  <div className="text-xs md:text-sm opacity-80 mb-2">Paiements Espèces</div>
+                  <div className="text-2xl md:text-3xl">{totalEspeces.toFixed(2)} €</div>
+                </div>
+              </div>
+
+              {/* Ventes par produit */}
+              <div>
+                <div className="mb-3 md:mb-5 pb-2 border-b-2 border-[#d4c5a9]">
+                  <h3 className="text-[#7d1f1f]">Ventes par produit</h3>
+                </div>
+                <div className="overflow-x-auto -mx-4 md:mx-0">
+                  <div className="min-w-[400px] px-4 md:px-0">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b-2 border-[#d4c5a9]">
+                          <th className="text-left p-3 md:p-4 text-[#7d1f1f]">Produit</th>
+                          <th className="text-center p-3 md:p-4 text-[#7d1f1f]">Quantité</th>
+                          <th className="text-right p-3 md:p-4 text-[#7d1f1f]">Total</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {Object.keys(salesByProduct).length === 0 ? (
+                          <tr>
+                            <td colSpan={3} className="text-center py-8 md:py-12 text-gray-400">
+                              Aucune vente
+                            </td>
+                          </tr>
+                        ) : (
+                          Object.entries(salesByProduct)
+                            .sort((a, b) => b[1].total - a[1].total)
+                            .map(([productName, data]) => (
+                              <tr key={productName} className="border-b border-[#d4c5a9] hover:bg-[#f5f1e8]">
+                                <td className="p-3 md:p-4 text-gray-700 text-sm md:text-base">{productName}</td>
+                                <td className="p-3 md:p-4 text-center text-gray-600 text-sm md:text-base">{data.quantity}</td>
+                                <td className="p-3 md:p-4 text-right text-[#7d1f1f] text-sm md:text-base">
+                                  {data.total.toFixed(2)} €
+                                </td>
+                              </tr>
+                            ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
-        {/* Current Order - Always visible on the right */}
-        <div className="bg-[#fdfcf7] rounded-2xl shadow-lg p-8 flex flex-col">
+        {/* Current Order - Desktop: Always visible, Mobile: Fixed bottom panel */}
+        <div className="hidden lg:flex bg-[#fdfcf7] rounded-2xl shadow-lg p-8 flex-col">
           <div className="mb-6 pb-3 border-b-2 border-[#d4c5a9]">
             <h2 className="text-[#7d1f1f]">Commande en cours</h2>
           </div>
@@ -538,6 +544,96 @@ export function CaisseEnregistreuse() {
           </div>
         </div>
       </div>
+
+      {/* Mobile Order Button - Fixed at bottom */}
+      {activeTab === 'menu' && (
+        <button
+          onClick={() => setShowOrderPanel(true)}
+          className="lg:hidden fixed bottom-4 right-4 bg-[#7d1f1f] text-[#fdfcf7] p-4 rounded-full shadow-lg flex items-center gap-2 z-50"
+        >
+          <span className="text-sm">Commande ({currentOrder.length})</span>
+          <span className="text-sm">{total.toFixed(2)} €</span>
+        </button>
+      )}
+
+      {/* Mobile Order Panel - Slide up */}
+      {showOrderPanel && (
+        <div className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-50" onClick={() => setShowOrderPanel(false)}>
+          <div 
+            className="absolute bottom-0 left-0 right-0 bg-[#fdfcf7] rounded-t-3xl shadow-lg p-6 max-h-[80vh] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-4 pb-3 border-b-2 border-[#d4c5a9] flex justify-between items-center">
+              <h2 className="text-[#7d1f1f]">Commande en cours</h2>
+              <button
+                onClick={() => setShowOrderPanel(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto mb-4 space-y-2">
+              {currentOrder.length === 0 ? (
+                <p className="text-gray-400 text-center py-8">Aucun article</p>
+              ) : (
+                currentOrder.map((item, index) => (
+                  <div key={index} className="flex justify-between items-center p-3 bg-[#f5f1e8] rounded-xl shadow-sm">
+                    <span className="text-gray-700 text-sm">{item.name}</span>
+                    <span className="text-[#7d1f1f]">{item.price.toFixed(2)} €</span>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Total */}
+            <div className="border-t-2 border-[#d4c5a9] pt-4 mb-4">
+              <div className="flex justify-between items-center mb-4">
+                <span className="text-gray-700">Total</span>
+                <span className="text-[#7d1f1f]">{total.toFixed(2)} €</span>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="space-y-2">
+              <button
+                onClick={() => processPayment('cb')}
+                disabled={currentOrder.length === 0}
+                className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white p-3 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 disabled:cursor-not-allowed"
+              >
+                <CreditCard className="w-5 h-5" />
+                <span>Payer par CB</span>
+              </button>
+
+              <button
+                onClick={() => processPayment('especes')}
+                disabled={currentOrder.length === 0}
+                className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-300 text-white p-3 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 disabled:cursor-not-allowed"
+              >
+                <Banknote className="w-5 h-5" />
+                <span>Payer en espèces</span>
+              </button>
+
+              <button
+                onClick={removeLastItem}
+                disabled={currentOrder.length === 0}
+                className="w-full bg-[#c85a3a] hover:bg-[#b54e31] disabled:bg-gray-300 text-white p-2 rounded-xl shadow-md transition-all disabled:cursor-not-allowed text-sm"
+              >
+                Retirer dernier article
+              </button>
+
+              <button
+                onClick={clearOrder}
+                disabled={currentOrder.length === 0}
+                className="w-full bg-red-600 hover:bg-red-700 disabled:bg-gray-300 text-white p-2 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 disabled:cursor-not-allowed text-sm"
+              >
+                <Trash2 className="w-4 h-4" />
+                <span>Annuler</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
