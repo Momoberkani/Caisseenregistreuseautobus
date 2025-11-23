@@ -34,6 +34,7 @@ interface Transaction {
   total: number;
   paymentMethod: 'cb' | 'especes';
   timestamp: Date;
+  cancelled?: boolean;
 }
 
 const MENU_ITEMS: MenuCategory[] = [
@@ -176,13 +177,13 @@ export function CaisseEnregistreuse() {
   const { categories: filteredCategories, wines: filteredWines } = filterItems();
 
   // Calculs pour les statistiques
-  const totalCA = transactions.reduce((sum, t) => sum + t.total, 0);
-  const totalCB = transactions.filter(t => t.paymentMethod === 'cb').reduce((sum, t) => sum + t.total, 0);
-  const totalEspeces = transactions.filter(t => t.paymentMethod === 'especes').reduce((sum, t) => sum + t.total, 0);
+  const totalCA = transactions.filter(t => !t.cancelled).reduce((sum, t) => sum + t.total, 0);
+  const totalCB = transactions.filter(t => !t.cancelled && t.paymentMethod === 'cb').reduce((sum, t) => sum + t.total, 0);
+  const totalEspeces = transactions.filter(t => !t.cancelled && t.paymentMethod === 'especes').reduce((sum, t) => sum + t.total, 0);
   
   // CA par produit
   const salesByProduct: { [key: string]: { quantity: number; total: number } } = {};
-  transactions.forEach(transaction => {
+  transactions.filter(t => !t.cancelled).forEach(transaction => {
     transaction.items.forEach(item => {
       if (!salesByProduct[item.name]) {
         salesByProduct[item.name] = { quantity: 0, total: 0 };
@@ -355,7 +356,7 @@ export function CaisseEnregistreuse() {
                       </tr>
                     ) : (
                       transactions.map((transaction) => (
-                        <tr key={transaction.id} className="border-b border-[#d4c5a9] hover:bg-[#f5f1e8]">
+                        <tr key={transaction.id} className={`border-b border-[#d4c5a9] hover:bg-[#f5f1e8] ${transaction.cancelled ? 'opacity-50' : ''}`}>
                           <td className="p-4 text-gray-600">
                             {transaction.timestamp.toLocaleTimeString('fr-FR', { 
                               hour: '2-digit', 
@@ -365,11 +366,15 @@ export function CaisseEnregistreuse() {
                           <td className="p-4 text-gray-600">
                             {transaction.items.map((item, i) => item.name).join(', ')}
                           </td>
-                          <td className="p-4 text-right text-[#7d1f1f]">
+                          <td className={`p-4 text-right ${transaction.cancelled ? 'text-gray-400 line-through' : 'text-[#7d1f1f]'}`}>
                             {transaction.total.toFixed(2)} €
                           </td>
                           <td className="p-4 text-center">
-                            {transaction.paymentMethod === 'cb' ? (
+                            {transaction.cancelled ? (
+                              <span className="inline-flex items-center gap-1 bg-gray-100 text-gray-500 px-3 py-1 rounded-full">
+                                Annulé
+                              </span>
+                            ) : transaction.paymentMethod === 'cb' ? (
                               <span className="inline-flex items-center gap-1 bg-blue-100 text-blue-700 px-3 py-1 rounded-full">
                                 <CreditCard className="w-4 h-4" />
                                 CB
@@ -382,12 +387,14 @@ export function CaisseEnregistreuse() {
                             )}
                           </td>
                           <td className="p-4 text-center">
-                            <button
-                              onClick={() => deleteTransaction(transaction.id)}
-                              className="bg-red-600 hover:bg-red-700 text-white p-2 rounded-full shadow-md transition-all"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
+                            {!transaction.cancelled && (
+                              <button
+                                onClick={() => deleteTransaction(transaction.id)}
+                                className="bg-red-600 hover:bg-red-700 text-white p-2 rounded-full shadow-md transition-all"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            )}
                           </td>
                         </tr>
                       ))
