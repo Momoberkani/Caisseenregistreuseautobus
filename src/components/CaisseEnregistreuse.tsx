@@ -141,7 +141,9 @@ export function CaisseEnregistreuse() {
   };
 
   const deleteTransaction = (id: string) => {
-    setTransactions(transactions.filter(t => t.id !== id));
+    setTransactions(transactions.map(t => 
+      t.id === id ? { ...t, cancelled: true } : t
+    ));
   };
 
   // Fonction de recherche
